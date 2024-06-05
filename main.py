@@ -21,6 +21,7 @@ class ImageEditorGUI:
         self.current_color = 0
 
         self.create_widgets()
+        self.draw_image()  # Draw image on initialization
 
     def create_widgets(self):
         self.color_label = tk.Label(self.master, text="Color:")
@@ -102,7 +103,7 @@ class ImageEditorGUI:
         file_path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")], initialfile="image.json")
         if file_path:
             data = {
-                "color_map": self.color_map,
+                "color_map": {int(k): v for k, v in self.color_map.items()},
                 "number_array": self.image_array.tolist()
             }
             with open(file_path, 'w') as json_file:
@@ -113,8 +114,9 @@ class ImageEditorGUI:
         if file_path:
             with open(file_path, 'r') as json_file:
                 data = json.load(json_file)
-            self.color_map = data["color_map"]
+            self.color_map = {int(k): tuple(v) for k, v in data["color_map"].items()}
             self.image_array = np.array(data["number_array"])
+            self.update_color_dropdown()
             self.draw_image()
 
 root = tk.Tk()
